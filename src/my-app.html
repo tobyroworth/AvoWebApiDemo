@@ -1,0 +1,147 @@
+<!--
+@license
+Copyright (c) 2016 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-input/paper-input.html">
+<link rel="import" href="../bower_components/app-layout/app-header-layout/app-header-layout.html">
+<link rel="import" href="../bower_components/app-layout/app-header/app-header.html">
+<link rel="import" href="../bower_components/app-layout/app-toolbar/app-toolbar.html">
+<link rel="import" href="../bower_components/app-storage/app-localstorage/app-localstorage-document.html">
+<link rel="import" href="../bower_components/iron-flex-layout/iron-flex-layout-classes.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-icon-button/paper-icon-button.html">
+<link rel="import" href="avo-titan-api.html">
+<link rel="import" href="avo-playback-button.html">
+
+<dom-module id="my-app">
+  <template>
+    <style is="custom-style" include="iron-flex iron-flex-alignment"></style>
+    <style>
+      :host {
+        --app-primary-color: #dd0031;
+        --app-secondary-color: black;
+
+        display: block;
+      }
+      
+      app-header {
+        background-color: #53565A;
+        color: #ffffff;
+      }
+      
+      app-toolbar {
+        max-width: 1280px;
+      }
+      
+      #main {
+        max-width: 1280px;
+      }
+      
+      avo-playback-button {
+        /*width: 25vw;*/
+        /*height: 40vh;*/
+      }
+  			
+			paper-card {
+				margin: 2vw;
+				width: 10vw;
+				min-width: 300px;
+				
+				opacity: 1;
+				will-change: opacity, transform;
+				transition: opacity 0.5s, transform 0.2s;
+				
+				--paper-card-header: {
+				  background-color: #dd0031;
+				}
+				
+				--paper-card-header-text: {
+				  color: #ffffff;
+				}
+			}
+			
+			paper-card.hideSettings {
+			  transform: scale(0);
+			  opacity: 0;
+			}
+			
+			paper-input {
+			  --paper-input-container-focus-color: #dd0031;
+			  --paper-input-container-invalid-color: #F37715;
+			}
+      
+    </style>
+      <app-header-layout fullbleed>
+        
+        <app-header fixed shadow class="layout horizontal center-justified">
+          <app-toolbar>
+            <div main-title>Avolites WebAPI Demo</div>
+            <paper-icon-button icon="settings" on-tap="_toggleSettings"></paper-icon-button>
+          </app-toolbar>
+        </app-header>
+        
+        <div id="container" class="layout horizontal center-justified">
+          <div id="main" class="layout horizontal wrap">
+            
+            <template is="dom-repeat" items="{{handles}}">
+              <avo-playback-button handle="[[item]]"></avo-playback-button>
+            </template>
+            
+            <paper-card heading="Settings" id="settings" class="hideSettings">
+              <div class="card-content">
+                <paper-input label="IP Address" value="{{network.ip}}" pattern="^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$" auto-validate error-message="Not a valid IPv4 address"></paper-input>
+                <paper-input label="Port" value="{{network.port}}" pattern="^[0-9]{1,5}$" auto-validate error-message="Not a valid port"></paper-input>
+              </div>
+            </paper-card>
+          </div>
+        </div>
+        
+      </app-header-layout>
+      <avo-titan-api id="api" handles="{{handles}}" network="[[network]]"></avo-titan-api>
+      <app-localstorage-document key="network" data="{{network}}"></app-localstorage-document>
+  </template>
+
+  <script>
+    Polymer({
+      is: 'my-app',
+
+      properties: {
+        network: {
+					type: Object,
+					value: function() {
+					  return {
+					    ip: undefined,
+					    port: undefined
+					  };
+					}
+				},
+        handles: {
+          type: Array
+        },
+        settings: {
+          type: Boolean,
+          value: false
+        }
+      },
+      
+      _firePlayback: function(e) {
+        let id = e.model.item.titanId;
+        
+        this.$.api.firePlayback(id);
+        
+      },
+      
+      _toggleSettings: function() {
+        this.toggleClass("hideSettings", this.settings, this.$.settings);
+        this.set("settings", !this.settings);
+      }
+    });
+  </script>
+</dom-module>

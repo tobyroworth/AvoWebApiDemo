@@ -1,0 +1,93 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/iron-signals/iron-signals.html">
+<link rel="import" href="../bower_components/iron-ajax/iron-ajax.html">
+
+<dom-module id="avo-titan-api">
+  <template>
+	  <iron-ajax id="handles"
+		url="{{_computePath(rootPath, 'handles/RollerA')}}"
+		method="GET"
+		handle-as="json"
+		last-response="{{handles}}"
+		auto
+	  ></iron-ajax>
+	  <iron-ajax id="ajax"
+		url=""
+		method="GET"
+		handle-as="json"
+	  ></iron-ajax>
+	  <iron-signals on-iron-signal-get="_signalGet"></iron-signals>
+  </template>
+
+  <script>
+		Polymer({
+			is: 'avo-titan-api',
+			
+			properties: {
+				getHandles: {
+					type: Boolean,
+					value: false
+				},
+				network: {
+					type: Object
+				},
+				rootPath: {
+					type: String,
+					computed: "_computeRootPath(network.ip, network.port)"
+				},
+				response: {
+					type: Object,
+					observer: "_handleResponse"
+				},
+				handles: {
+					type: Array,
+					notify: true
+				}
+			},
+
+			ready: function() {
+				// this._getHandles("RollerA");
+			},
+
+			_computeRootPath: function(ip, port) {
+				return "http://" + ip + ":" + port + "/titan/";
+			},
+
+			_computePath: function(root, path) {
+				return root + path;
+			},
+
+			_signalGet: function(e, detail) {
+				this.titanGet(detail.path, detail.params);
+			},
+
+			titanGet: function(path, params) {
+				this.$.ajax.set("method", "GET");
+				this.$.ajax.set("params", params);
+				this.$.ajax.set("body", null);
+				this.$.ajax.set("url", this._computePath(this.get("rootPath"), path));
+				this.$.ajax.generateRequest();
+			},
+
+			titanSet: function(path, body) {
+				this.set("ajax.method", "POST");
+				this.set("ajax.params", null);
+				this.set("ajax.body", params);
+				this.set("ajax.url", this._computePath(this.get("rootPath"), path));
+			},
+
+			_getHandles: function(group) {
+				this.titanGet("handles/" + group);
+			},
+			
+			firePlayback: function(id) {
+				this.titanGet("script/Playbacks/FirePlaybackAtLevel", {titanId: id, level: 1, bool: false});
+			},
+			
+			killPlayback: function(id) {
+				this.titanGet("script/Playbacks/KillPlayback", {titanId: id});
+			}
+	
+		});
+  </script>
+</dom-module>

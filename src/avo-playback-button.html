@@ -1,0 +1,147 @@
+<link rel="import" href="../bower_components/polymer/polymer.html">
+<link rel="import" href="../bower_components/paper-card/paper-card.html">
+<link rel="import" href="../bower_components/paper-slider/paper-slider.html">
+<link rel="import" href="../bower_components/iron-icon/iron-icon.html">
+<link rel="import" href="../bower_components/iron-icons/iron-icons.html">
+
+<dom-module id="avo-playback-button">
+  <template>
+  		<style>
+  			:host {
+  				display: block;
+  				
+  				margin: 2vw;
+  			}
+  			
+  			paper-card {
+  				width: 10vw;
+				min-width: 200px;
+				
+				--paper-card-actions: {
+					background-color: #53565A;
+					transition: background-color 0.2s;
+				}
+				
+  			}
+  			
+  			iron-icon {
+  				color: #ffffff;
+  			}
+  			
+  			paper-card.fired {
+  				
+				--paper-card-actions: {
+					background-color: #dd0031;
+				}
+  			}
+  			
+  			paper-slider {
+  				--paper-slider-active-color: #53565a;
+  				--paper-slider-knob-color: #53565a;
+  			}
+  			
+  			paper-slider.fired {
+  				--paper-slider-active-color: #dd0031;
+  				--paper-slider-knob-color: #dd0031;
+  			}
+  			
+  			/*:host {*/
+  			/*	display: block;*/
+  			/*	border-radius: 2vw 0 2vw 0;*/
+  			/*	background-color: #53565A;*/
+  				
+  			/*	width: max-content;*/
+  			/*	height: max-content;*/
+  				
+  			/*	padding: 2vw;*/
+  			/*	margin: 2vw;*/
+  			/*	transition: background-color 0.2s;*/
+  			/*}*/
+  			
+  			/*:host(.fired) {*/
+  			/*	background-color: #dd0031;*/
+  			/*}*/
+  		</style>
+  		<!--<div class="inner">-->
+	  		<!--<h1>{{handle.Legend}}</h1>-->
+	  	<!--</div>-->
+	  	<paper-card id="card" image="../images/cards/eiffel_small.jpg" preload-image fade-image >
+	  		<div class="card-content">
+	  			<h3>{{handle.Legend}}</h3>
+	  			<paper-slider id="level" value="{{level}}"></paper-slider>
+	  		</div>
+	  		<div class="card-actions">
+	  			<iron-icon icon="{{_computeVisibilityIcon(handle.Active)}}"></iron-icon>
+	  		</div>
+	  	</paper-card>
+  </template>
+
+  <script>
+		Polymer({
+			is: 'avo-playback-button',
+			
+			properties: {
+				handle: {
+					type: Array,
+					notify: true
+				},
+				level: {
+					type: Number,
+					value: 100,
+					observer: "_levelChanged"
+				}
+			},
+			
+			observers: [
+				"_activeChanged(handle.Active)"
+			],
+			
+			listeners: {
+				"tap": "_toggleFired"
+			},
+			
+			_toggleFired: function() {
+				if (this.handle.Active) {
+					this.killPlayback();
+					this.set("handle.Active", !this.handle.Active);
+				} else {
+					this.firePlayback();
+					this.set("handle.Active", !this.handle.Active);
+				}
+			},
+			
+			firePlayback: function() {
+				this.fire("iron-signal", {name:"get", data: {path: "script/Playbacks/FirePlaybackAtLevel", params: {titanId: this.handle.titanId, level: this.level/100, bool: false}}});
+			},
+			
+			killPlayback: function() {
+				this.fire("iron-signal", {name:"get", data: {path: "script/Playbacks/KillPlayback", params: {titanId: this.handle.titanId}}});
+			},
+			
+			_computeVisibilityIcon: function(active) {
+				if (active) {
+					return "visibility";
+				} else {
+					return "visibility-off";
+				}
+			},
+			
+			_levelChanged: function(newValue) {
+				if (this.handle) {
+					if (newValue <= 0) {
+						this.killPlayback();
+					} else {
+						this.firePlayback();
+					}
+				}
+			},
+			
+			_activeChanged: function(newValue) {
+				this.toggleClass("fired", this.handle.Active, this.$.card);
+				this.toggleClass("fired", this.handle.Active, this.$.level);
+				this.updateStyles();
+			}
+	
+		});
+  </script>
+</dom-module>

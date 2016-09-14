@@ -1,0 +1,20 @@
+{
+  "name": "Avolites WebAPI Demo",
+  "short_name": "WebAPI",
+  "start_url": "/?homescreen=1",
+  "display": "standalone",
+  "theme_color": "#dd0031",
+  "background_color": "#dd0031",
+  "icons": [
+    {
+      "src": "images/manifest/icon-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "images/manifest/icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
