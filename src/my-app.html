@@ -45,6 +45,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         margin-top: 6vw;
       }
       
+      #info {
+        max-width: 80vw;
+        margin-top: 6vw;
+      }
+      
       avo-playback-button {
         /*width: 25vw;*/
         /*height: 40vh;*/
@@ -58,7 +63,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 				opacity: 1;
 				will-change: opacity, transform;
 				transition: opacity 0.5s, transform 0.2s, width 0.2s, min-width 0.2s, margin 0.2s;
-				
+  				
+				--paper-card-actions: {
+					background-color: #53565A;
+					color: #ffffff;
+					position: absolute;
+					bottom: 0;
+					left: 0;
+					right: 0;
+				}
+			}
+			
+			#settings {
+			  
 				--paper-card-header: {
 				  background-color: #dd0031;
 				}
@@ -68,7 +85,32 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 				}
 			}
 			
+			#infoCard {
+			  
+				--paper-card-header: {
+				  background-color: #53565A;
+				}
+				
+				--paper-card-header-text: {
+				  color: #ffffff;
+				}
+			}
+			
+			#infoCard .card-content {
+			  
+			  padding-right: 1vw;
+			  text-align: justify;
+			}
+			
 			paper-card.hideSettings {
+			  transform: scale(0);
+			  opacity: 0;
+			  width: 0;
+			  min-width: 0;
+			  margin: 0;
+			}
+			
+			paper-card.hideInfo {
 			  transform: scale(0);
 			  opacity: 0;
 			  width: 0;
@@ -102,17 +144,36 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <paper-input label="IP Address" value="{{network.ip}}" pattern="^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$" auto-validate error-message="Not a valid IPv4 address"></paper-input>
                 <paper-input label="Port" value="{{network.port}}" pattern="^[0-9]{1,5}$" auto-validate error-message="Not a valid port"></paper-input>
               </div>
+              <div class="card-actions">
+                <paper-icon-button icon="fullscreen" on-tap="_toggleFullscreen"></paper-icon-button>
+                <paper-icon-button icon="info" on-tap="_toggleInfo"></paper-icon-button>
+              </div>
             </paper-card>
             
             <template is="dom-repeat" items="{{handles}}">
               <avo-playback-button index="[[index]]" handle="[[item]]"></avo-playback-button>
             </template>
           </div>
+          <div id="info">
+            <paper-card id="infoCard" heading="About the API" class="hideInfo">
+              <div class="card-content">
+                <ul>
+                  <li>Control Titan via simple HTTP commands</li>
+                  <li>Integrate Titan products into custom install projects</li>
+                  <li>Get the programming power of Titan, leave a simple to use interface</li>
+                  <li>UI fully customizable with HTML, CSS and JavaScript</li>
+                  <li>Runs on any platform capable of HTTP - desktop, mobile, embedded</li>
+                  <li>Project support available</li>
+                </ul>
+              </div>
+            </paper-card>
+          </div>
         </div>
         
       </app-header-layout>
       <avo-titan-api id="api" handles="{{handles}}" network="[[network]]"></avo-titan-api>
       <app-localstorage-document key="network" data="{{network}}"></app-localstorage-document>
+      <app-localstorage-document key="showInfo" data="{{info}}"></app-localstorage-document>
   </template>
 
   <script>
@@ -135,6 +196,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         settings: {
           type: Boolean,
           value: false
+        },
+        info: {
+          type: Boolean,
+          observer: "_infoChanged"
         }
       },
       
@@ -152,6 +217,37 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       
       _refresh: function() {
         this.$.api.getHandles();
+      },
+      
+      _toggleFullscreen: function(e) {
+        
+        let fullscreenElement = document.fullscreenElement || document.mozFullscreenElement || document.webkitFullscreenElement;
+        
+        if (fullscreenElement) {
+          if(document.exitFullscreen) {
+            document.exitFullscreen();
+          } else if(document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+          } else if(document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+          }
+        } else {
+          if (document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen();
+          } else if (document.documentElement.webkitRequestFullscreen) {
+            document.documentElement.webkitRequestFullscreen();
+          } else if (document.documentElement.mozRequestFullscreen) {
+            document.documentElement.mozRequestFullscreen();
+          }
+        }
+      },
+      
+      _toggleInfo: function() {
+        this.set("info", !this.info);
+      },
+      
+      _infoChanged: function(newValue) {
+        this.toggleClass("hideInfo", !newValue, this.$.infoCard);
       }
     });
   </script>
