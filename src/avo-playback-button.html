@@ -14,8 +14,8 @@
   			}
   			
   			paper-card {
-  				width: 10vw;
-				min-width: 200px;
+  				width: 16vw;
+				min-width: 300px;
 				
 				--paper-card-actions: {
 					background-color: #53565A;
@@ -36,6 +36,7 @@
   			}
   			
   			paper-slider {
+  				width: 100%;
   				--paper-slider-active-color: #53565a;
   				--paper-slider-knob-color: #53565a;
   			}
@@ -65,10 +66,10 @@
   		<!--<div class="inner">-->
 	  		<!--<h1>{{handle.Legend}}</h1>-->
 	  	<!--</div>-->
-	  	<paper-card id="card" image="../images/cards/eiffel_small.jpg" preload-image fade-image >
+	  	<paper-card id="card" image="{{_computeImage(index)}}" preload-image fade-image >
 	  		<div class="card-content">
 	  			<h3>{{handle.Legend}}</h3>
-	  			<paper-slider id="level" value="{{level}}"></paper-slider>
+	  			<paper-slider id="level" value="{{level}}" on-tap="_cancelBubble"></paper-slider>
 	  		</div>
 	  		<div class="card-actions">
 	  			<iron-icon icon="{{_computeVisibilityIcon(handle.Active)}}"></iron-icon>
@@ -89,6 +90,9 @@
 					type: Number,
 					value: 100,
 					observer: "_levelChanged"
+				},
+				index: {
+					type: Number
 				}
 			},
 			
@@ -103,19 +107,19 @@
 			_toggleFired: function() {
 				if (this.handle.Active) {
 					this.killPlayback();
-					this.set("handle.Active", !this.handle.Active);
 				} else {
 					this.firePlayback();
-					this.set("handle.Active", !this.handle.Active);
 				}
 			},
 			
 			firePlayback: function() {
 				this.fire("iron-signal", {name:"get", data: {path: "script/Playbacks/FirePlaybackAtLevel", params: {titanId: this.handle.titanId, level: this.level/100, bool: false}}});
+				this.set("handle.Active", true);
 			},
 			
 			killPlayback: function() {
 				this.fire("iron-signal", {name:"get", data: {path: "script/Playbacks/KillPlayback", params: {titanId: this.handle.titanId}}});
+					this.set("handle.Active", false);
 			},
 			
 			_computeVisibilityIcon: function(active) {
@@ -140,6 +144,14 @@
 				this.toggleClass("fired", this.handle.Active, this.$.card);
 				this.toggleClass("fired", this.handle.Active, this.$.level);
 				this.updateStyles();
+			},
+			
+			_computeImage: function(index) {
+				return "../images/cards/" + index + ".png";
+			},
+			
+			_cancelBubble: function(e) {
+				e.stopPropagation();
 			}
 	
 		});

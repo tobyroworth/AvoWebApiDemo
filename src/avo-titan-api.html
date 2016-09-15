@@ -24,10 +24,6 @@
 			is: 'avo-titan-api',
 			
 			properties: {
-				getHandles: {
-					type: Boolean,
-					value: false
-				},
 				network: {
 					type: Object
 				},
@@ -69,23 +65,15 @@
 				this.$.ajax.generateRequest();
 			},
 
-			titanSet: function(path, body) {
-				this.set("ajax.method", "POST");
-				this.set("ajax.params", null);
-				this.set("ajax.body", params);
-				this.set("ajax.url", this._computePath(this.get("rootPath"), path));
-			},
+			// titanSet: function(path, body) {
+			// 	this.set("ajax.method", "POST");
+			// 	this.set("ajax.params", null);
+			// 	this.set("ajax.body", params);
+			// 	this.set("ajax.url", this._computePath(this.get("rootPath"), path));
+			// },
 
-			_getHandles: function(group) {
-				this.titanGet("handles/" + group);
-			},
-			
-			firePlayback: function(id) {
-				this.titanGet("script/Playbacks/FirePlaybackAtLevel", {titanId: id, level: 1, bool: false});
-			},
-			
-			killPlayback: function(id) {
-				this.titanGet("script/Playbacks/KillPlayback", {titanId: id});
+			getHandles: function(group) {
+				this.$.handles.generateRequest();
 			}
 	
 		});

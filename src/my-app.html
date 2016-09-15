@@ -37,11 +37,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
       
       app-toolbar {
-        max-width: 1280px;
+        /*max-width: 1280px;*/
       }
       
       #main {
-        max-width: 1280px;
+        max-width: 80vw;
+        margin-top: 6vw;
       }
       
       avo-playback-button {
@@ -51,12 +52,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   			
 			paper-card {
 				margin: 2vw;
-				width: 10vw;
+				width: 16vw;
 				min-width: 300px;
 				
 				opacity: 1;
 				will-change: opacity, transform;
-				transition: opacity 0.5s, transform 0.2s;
+				transition: opacity 0.5s, transform 0.2s, width 0.2s, min-width 0.2s, margin 0.2s;
 				
 				--paper-card-header: {
 				  background-color: #dd0031;
@@ -70,6 +71,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 			paper-card.hideSettings {
 			  transform: scale(0);
 			  opacity: 0;
+			  width: 0;
+			  min-width: 0;
+			  margin: 0;
 			}
 			
 			paper-input {
@@ -81,18 +85,17 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <app-header-layout fullbleed>
         
         <app-header fixed shadow class="layout horizontal center-justified">
+          <div class="flex"></div>
           <app-toolbar>
             <div main-title>Avolites WebAPI Demo</div>
+            <paper-icon-button icon="refresh" on-tap="_refresh"></paper-icon-button>
             <paper-icon-button icon="settings" on-tap="_toggleSettings"></paper-icon-button>
           </app-toolbar>
+          <div class="flex"></div>
         </app-header>
         
         <div id="container" class="layout horizontal center-justified">
           <div id="main" class="layout horizontal wrap">
-            
-            <template is="dom-repeat" items="{{handles}}">
-              <avo-playback-button handle="[[item]]"></avo-playback-button>
-            </template>
             
             <paper-card heading="Settings" id="settings" class="hideSettings">
               <div class="card-content">
@@ -100,6 +103,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 <paper-input label="Port" value="{{network.port}}" pattern="^[0-9]{1,5}$" auto-validate error-message="Not a valid port"></paper-input>
               </div>
             </paper-card>
+            
+            <template is="dom-repeat" items="{{handles}}">
+              <avo-playback-button index="[[index]]" handle="[[item]]"></avo-playback-button>
+            </template>
           </div>
         </div>
         
@@ -141,6 +148,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _toggleSettings: function() {
         this.toggleClass("hideSettings", this.settings, this.$.settings);
         this.set("settings", !this.settings);
+      },
+      
+      _refresh: function() {
+        this.$.api.getHandles();
       }
     });
   </script>
